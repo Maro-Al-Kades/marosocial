@@ -11,6 +11,7 @@ import { MdBlock } from "react-icons/md";
 import { User } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
+import UserInfoCardInteraction from "./UserInfoCardInteraction";
 
 const UserInfoCard = async ({ user }: { user: User }) => {
   const createdAtDate = new Date(user.createdAt);
@@ -127,18 +128,13 @@ const UserInfoCard = async ({ user }: { user: User }) => {
           </div>
         </div>
 
-        <Button size="sm" className="flex items-center gap-2">
-          Follow <IoPersonAdd size={16} />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-red-500 self-end text-xs cursor-pointer flex gap-1 items-center hover:text-red-500"
-        >
-          Block User
-          <MdBlock />
-        </Button>
+        <UserInfoCardInteraction
+          userId={user.id}
+          currentUserId={currentUserId}
+          isUserBlocked={isUserBlocked}
+          isFollowing={isFollowing}
+          isFollowingSent={isFollowingSent}
+        />
       </div>
     </div>
   );
