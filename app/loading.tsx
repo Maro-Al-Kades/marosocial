@@ -9,7 +9,7 @@ const loading = () => {
           visible={true}
           height="50"
           width="50"
-          color="#e11d48"
+          color="#2563EB"
           ariaLabel="grid-loading"
           radius="12.5"
           wrapperStyle={{}}
