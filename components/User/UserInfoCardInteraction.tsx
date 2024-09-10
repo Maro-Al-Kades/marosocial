@@ -3,17 +3,15 @@
 import { IoPersonAdd } from "react-icons/io5";
 import { Button } from "../ui/button";
 import { MdBlock } from "react-icons/md";
-import { useState } from "react";
-import { switchFollow } from "@/lib/actions";
+import { useOptimistic, useState } from "react";
+import { switchBlock, switchFollow } from "@/lib/actions";
 
 const UserInfoCardInteraction = ({
-  currentUserId,
   userId,
   isUserBlocked,
   isFollowing,
   isFollowingSent,
 }: {
-  currentUserId: string;
   userId: string;
   isUserBlocked: boolean;
   isFollowing: boolean;
@@ -26,6 +24,7 @@ const UserInfoCardInteraction = ({
   });
 
   const follow = async () => {
+    switchOptimisticState("follow");
     try {
       await switchFollow(userId);
       setUserState((prev) => ({
@@ -36,15 +35,42 @@ const UserInfoCardInteraction = ({
       }));
     } catch (error) {}
   };
+
+  const block = async () => {
+    switchOptimisticState("block");
+    try {
+      await switchBlock(userId);
+      setUserState((prev) => ({
+        ...prev,
+        blocked: !prev.blocked,
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const [optimisticState, switchOptimisticState] = useOptimistic(
+    userState,
+    (state, value: "follow" | "block") =>
+      value === "follow"
+        ? {
+            ...state,
+            following: state.following && false,
+            followingRequestSent:
+              !state.following && !state.followingRequestSent ? true : false,
+          }
+        : { ...state, blocked: !state.blocked }
+  );
+
   return (
     <>
       <form action={follow}>
         <Button size="sm" className="flex items-center gap-2 w-full">
-          {userState.following ? (
+          {optimisticState.following ? (
             <>
               Following <IoPersonAdd size={16} />
             </>
-          ) : userState.followingRequestSent ? (
+          ) : optimisticState.followingRequestSent ? (
             <>
               Friend Request Sent <IoPersonAdd size={16} />
             </>
@@ -56,13 +82,13 @@ const UserInfoCardInteraction = ({
         </Button>
       </form>
 
-      <form action="" className="self-end">
+      <form action={block} className="self-end">
         <Button
           variant="ghost"
           size="sm"
           className="text-red-500 text-xs cursor-pointer flex gap-1 items-center hover:text-red-500"
         >
-          {userState.blocked ? "UnBlock User" : "Block User"}
+          {optimisticState.blocked ? "UnBlock User" : "Block User"}
           <MdBlock />
         </Button>
       </form>

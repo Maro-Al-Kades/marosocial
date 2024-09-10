@@ -61,7 +61,7 @@ const ProfileCard = async () => {
 
         <Link
           className={`${buttonVariants({ className: "w-full text-sm" })}`}
-          href="/profile/1"
+          href="/profile/negan"
         >
           My Profile
         </Link>

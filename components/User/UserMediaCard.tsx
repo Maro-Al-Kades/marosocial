@@ -3,8 +3,21 @@ import React from "react";
 import { buttonVariants } from "../ui/button";
 import Image from "next/image";
 import { User } from "@prisma/client";
+import prisma from "@/lib/client";
 
-const UserMediaCard = ({ user }: { user: User }) => {
+const UserMediaCard = async ({ user }: { user: User }) => {
+  const postsWithMedia = await prisma.post.findMany({
+    where: {
+      userId: user.id,
+      img: {
+        not: null,
+      },
+    },
+    take: 8,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
   return (
     <div className="head flex flex-col gap-4">
       {/* TOP */}
@@ -23,77 +36,18 @@ const UserMediaCard = ({ user }: { user: User }) => {
 
       {/* BTM */}
       <div className="flex gap-4 justify-between flex-wrap">
-        <div className="relative w-1/5  h-28">
-          <Image
-            src="https://images.pexels.com/photos/837358/pexels-photo-837358.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            fill
-            alt="img"
-            className="object-cover rounded-md cursor-pointer"
-          />
-        </div>
-
-        <div className="relative w-1/5  h-28">
-          <Image
-            src="https://images.pexels.com/photos/1709003/pexels-photo-1709003.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            fill
-            alt="img"
-            className="object-cover rounded-md cursor-pointer"
-          />
-        </div>
-
-        <div className="relative w-1/5  h-28">
-          <Image
-            src="https://images.pexels.com/photos/27674151/pexels-photo-27674151/free-photo-of-a-man-speaking-into-a-microphone-at-a-podium.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            fill
-            alt="img"
-            className="object-cover rounded-md cursor-pointer"
-          />
-        </div>
-
-        <div className="relative w-1/5  h-28">
-          <Image
-            src="https://images.pexels.com/photos/240561/pexels-photo-240561.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            fill
-            alt="img"
-            className="object-cover rounded-md cursor-pointer"
-          />
-        </div>
-
-        <div className="relative w-1/5  h-28">
-          <Image
-            src="https://images.pexels.com/photos/746386/pexels-photo-746386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            fill
-            alt="img"
-            className="object-cover rounded-md cursor-pointer"
-          />
-        </div>
-
-        <div className="relative w-1/5  h-28">
-          <Image
-            src="https://images.pexels.com/photos/53214/trekking-hiking-group-alpine-53214.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            fill
-            alt="img"
-            className="object-cover rounded-md cursor-pointer"
-          />
-        </div>
-
-        <div className="relative w-1/5  h-28">
-          <Image
-            src="https://images.pexels.com/photos/1848565/pexels-photo-1848565.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            fill
-            alt="img"
-            className="object-cover rounded-md cursor-pointer"
-          />
-        </div>
-
-        <div className="relative w-1/5  h-28">
-          <Image
-            src="https://images.pexels.com/photos/196652/pexels-photo-196652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            fill
-            alt="img"
-            className="object-cover rounded-md cursor-pointer"
-          />
-        </div>
+        {postsWithMedia.length
+          ? postsWithMedia.map((post) => (
+              <div className="relative w-1/5  h-28" key={post.id}>
+                <Image
+                  src={post.img!}
+                  fill
+                  alt="img"
+                  className="object-cover rounded-md cursor-pointer"
+                />
+              </div>
+            ))
+          : "No Media Found!"}
       </div>
     </div>
   );
